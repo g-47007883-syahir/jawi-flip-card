@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Papan Skor 37 Huruf Jawi & Audio Sebutan</title>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #1e293b;
+      --scoreboard-bg: #0f172a;
+      --card-bg: #ffffff;
+      --card-text: #0f172a;
+      --accent-red: #ef4444;
+      --accent-blue: #3b82f6;
+      --accent-yellow: #facc15;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: var(--bg-color);
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    h1 {
+      margin: 0 0 5px 0;
+      font-size: 1.8rem;
+      text-align: center;
+    }
+
+    p.subtitle {
+      margin: 0 0 20px 0;
+      color: #94a3b8;
+      font-size: 0.95rem;
+      text-align: center;
+    }
+
+    .scoreboard {
+      background: var(--scoreboard-bg);
+      border: 4px solid #334155;
+      border-radius: 20px;
+      padding: 30px 25px 25px 25px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      max-width: 520px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .cards-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      width: 100%;
+      direction: rtl;
+    }
+
+    .flip-unit {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+    }
+
+    .unit-label {
+      font-size: 0.85rem;
+      color: #cbd5e1;
+      margin-bottom: 12px;
+      letter-spacing: 1px;
+      font-weight: 600;
+    }
+
+    .card-container {
+      position: relative;
+      width: 100%;
+      height: 180px;
+      background: var(--card-bg);
+      border-radius: 12px;
+      box-shadow: 0 8px 0px #cbd5e1, 0 12px 15px rgba(0,0,0,0.3);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      user-select: none;
+      transition: transform 0.1s ease;
+    }
+
+    .card-container:active {
+      transform: translateY(4px);
+      box-shadow: 0 4px 0px #cbd5e1;
+    }
+
+    .rings {
+      position: absolute;
+      top: -12px;
+      width: 80%;
+      display: flex;
+      justify-content: space-around;
+      z-index: 10;
+    }
+
+    .ring {
+      width: 12px;
+      height: 24px;
+      background: linear-gradient(135deg, #e2e8f0, #64748b);
+      border-radius: 6px;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.4);
+    }
+
+    .card-container::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: rgba(0, 0, 0, 0.15);
+      box-shadow: 0 1px 2px rgba(255,255,255,0.8);
+      z-index: 2;
+    }
+
+    .jawi-text {
+      font-family: 'Amiri', serif;
+      font-size: 4.5rem;
+      font-weight: bold;
+      color: var(--card-text);
+      line-height: 1;
+      margin-top: 10px;
+    }
+
+    .konsonan .jawi-text { color: var(--accent-red); }
+    .vokal .jawi-text { color: var(--accent-blue); }
+
+    .rumi-text {
+      font-size: 0.85rem;
+      color: #64748b;
+      margin-top: 5px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .plus-sign {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #475569;
+      margin-top: 20px;
+    }
+
+    .result-box {
+      margin-top: 25px;
+      width: 100%;
+      background: #1e293b;
+      border: 2px dashed #475569;
+      border-radius: 12px;
+      padding: 15px;
+      text-align: center;
+      box-sizing: border-box;
+      position: relative;
+    }
+
+    .result-jawi {
+      font-family: 'Amiri', serif;
+      font-size: 2.8rem;
+      color: var(--accent-yellow);
+      line-height: 1.2;
+    }
+
+    .result-rumi {
+      font-size: 1.1rem;
+      color: #38bdf8;
+      font-weight: bold;
+      margin-top: 2px;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+      margin-top: 15px;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 0.85rem;
+      cursor: pointer;
+      color: white;
+    }
+
+    .btn-konsonan { background: var(--accent-red); }
+    .btn-konsonan:hover { background: #dc2626; }
+
+    .btn-vokal { background: var(--accent-blue); }
+    .btn-vokal:hover { background: #2563eb; }
+
+    .btn-audio {
+      background: #eab308;
+      color: #0f172a;
+      width: 100%;
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 8px;
+      border: none;
+      font-weight: bold;
+      font-size: 0.95rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-audio:hover {
+      background: #ca8a04;
+    }
+
+    .counter {
+      font-size: 0.8rem;
+      color: #94a3b8;
+      margin-top: 6px;
+    }
+
+    .flip-animate {
+      animation: flipDown 0.3s ease-in-out;
+    }
+
+    @keyframes flipDown {
+      0% { transform: rotateX(0deg); }
+      50% { transform: rotateX(-90deg); opacity: 0.5; }
+      100% { transform: rotateX(0deg); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Papan Skor Jawi & Audio</h1>
+  <p class="subtitle">Selak kad untuk mendengar bunyi suku kata</p>
+
+  <div class="scoreboard">
+    <div class="cards-wrapper">
+      
+      <!-- KAD KONSONAN -->
+      <div class="flip-unit konsonan">
+        <div class="unit-label">HURUF JAWI</div>
+        <div class="card-container" id="konsonanCard" onclick="nextKonsonan()">
+          <div class="rings">
+            <div class="ring"></div>
+            <div class="ring"></div>
+          </div>
+          <div class="jawi-text" id="konsonanJawi">ب</div>
+          <div class="rumi-text" id="konsonanRumi">Ba (B)</div>
+        </div>
+        <div class="counter" id="konsonanCounter">1 / 37</div>
+        <div class="controls">
+          <button class="btn btn-konsonan" onclick="nextKonsonan()">Selak Huruf</button>
+        </div>
+      </div>
+
+      <div class="plus-sign">+</div>
+
+      <!-- KAD VOKAL -->
+      <div class="flip-unit vokal">
+        <div class="unit-label">BUNYI VOKAL</div>
+        <div class="card-container" id="vokalCard" onclick="nextVokal()">
+          <div class="rings">
+            <div class="ring"></div>
+            <div class="ring"></div>
+          </div>
+          <div class="jawi-text" id="vokalJawi">ا</div>
+          <div class="rumi-text" id="vokalRumi">A</div>
+        </div>
+        <div class="counter" id="vokalCounter">1 / 6</div>
+        <div class="controls">
+          <button class="btn btn-vokal" onclick="nextVokal()">Selak Vokal</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- HASIL GABUNGAN SUKU KATA & AUDIO -->
+    <div class="result-box">
+      <div class="result-jawi" id="resultJawi">با</div>
+      <div class="result-rumi" id="resultRumi">BA</div>
+      <button class="btn-audio" onclick="playAudio()">
+        🔊 Dengar Sebutan
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // SENARAI KESEMUA 37 HURUF JAWI
+    const jawiList = [
+      { jawi: "ا", rumi: "Alif (A)", sound: "A" },
+      { jawi: "ب", rumi: "Ba (B)", sound: "B" },
+      { jawi: "ت", rumi: "Ta (T)", sound: "T" },
+      { jawi: "ۃ", rumi: "Ta Marbutah (T)", sound: "T" },
+      { jawi: "ث", rumi: "Sa (S)", sound: "S" },
+      { jawi: "ج", rumi: "Jim (J)", sound: "J" },
+      { jawi: "چ", rumi: "Cha (C)", sound: "C" },
+      { jawi: "ح", rumi: "Ha (H)", sound: "H" },
+      { jawi: "خ", rumi: "Kha (Kh)", sound: "Kh" },
+      { jawi: "د", rumi: "Dal (D)", sound: "D" },
+      { jawi: "ذ", rumi: "Zal (Z)", sound: "Z" },
+      { jawi: "ر", rumi: "Ra (R)", sound: "R" },
+      { jawi: "ز", rumi: "Zai (Z)", sound: "Z" },
+      { jawi: "س", rumi: "Sin (S)", sound: "S" },
+      { jawi: "ش", rumi: "Syin (Sy)", sound: "Sy" },
+      { jawi: "ص", rumi: "Sad (S)", sound: "S" },
+      { jawi: "ض", rumi: "Ddad (D)", sound: "D" },
+      { jawi: "ط", rumi: "Ta (T)", sound: "T" },
+      { jawi: "ظ", rumi: "Za (Z)", sound: "Z" },
+      { jawi: "ع", rumi: "Ain (A)", sound: "A" },
+      { jawi: "غ", rumi: "Ghain (Gh)", sound: "Gh" },
+      { jawi: "ڠ", rumi: "Nga (Ng)", sound: "Ng" },
+      { jawi: "ف", rumi: "Fa (F)", sound: "F" },
+      { jawi: "ڤ", rumi: "Pa (P)", sound: "P" },
+      { jawi: "ق", rumi: "Qaf (K)", sound: "K" },
+      { jawi: "ک", rumi: "Kaf (K)", sound: "K" },
+      { jawi: "ݢ", rumi: "Ga (G)", sound: "G" },
+      { jawi: "ل", rumi: "Lam (L)", sound: "L" },
+      { jawi: "م", rumi: "Mim (M)", sound: "M" },
+      { jawi: "ن", rumi: "Nun (N)", sound: "N" },
+      { jawi: "و", rumi: "Wau (W)", sound: "W" },
+      { jawi: "ۏ", rumi: "Va (V)", sound: "V" },
+      { jawi: "ه", rumi: "Ha (H)", sound: "H" },
+      { jawi: "ء", rumi: "Hamzah (A)", sound: "A" },
+      { jawi: "ي", rumi: "Ya (Y)", sound: "Y" },
+      { jawi: "ى", rumi: "Ye (Y)", sound: "Y" },
+      { jawi: "ڽ", rumi: "Nya (Ny)", sound: "Ny" }
+    ];
+
+    // SENARAI BUNYI VOKAL
+    const vokalList = [
+      { jawi: "ا", rumi: "A", code: "a", hasVowelLetter: true },
+      { jawi: "و", rumi: "U", code: "u", hasVowelLetter: true },
+      { jawi: "و", rumi: "O", code: "o", hasVowelLetter: true },
+      { jawi: "ي", rumi: "I", code: "i", hasVowelLetter: true },
+      { jawi: "ي", rumi: "E (Taling)", code: "e", hasVowelLetter: true },
+      { jawi: "—", rumi: "E (Pepet)", code: "e", hasVowelLetter: false }
+    ];
+
+    let kIndex = 1; // Ba
+    let vIndex = 0; // A
+    let currentSpeechText = "BA";
+
+    function updateDisplay() {
+      const kData = jawiList[kIndex];
+      const vData = vokalList[vIndex];
+
+      document.getElementById('konsonanJawi').innerText = kData.jawi;
+      document.getElementById('konsonanRumi').innerText = kData.rumi;
+      document.getElementById('konsonanCounter').innerText = `${kIndex + 1} / ${jawiList.length}`;
+
+      document.getElementById('vokalJawi').innerText = vData.jawi;
+      document.getElementById('vokalRumi').innerText = vData.rumi;
+      document.getElementById('vokalCounter').innerText = `${vIndex + 1} / ${vokalList.length}`;
+
+      let combinedJawi = "";
+      let combinedRumi = "";
+
+      if (vData.hasVowelLetter) {
+        combinedJawi = kData.jawi + vData.jawi;
+        combinedRumi = kData.sound + vData.code.toUpperCase();
+      } else {
+        combinedJawi = kData.jawi;
+        combinedRumi = kData.sound + vData.code.toUpperCase() + " (e-pepet)";
+      }
+
+      document.getElementById('resultJawi').innerText = combinedJawi;
+      document.getElementById('resultRumi').innerText = combinedRumi;
+
+      // Teks yang akan disebut oleh audio
+      currentSpeechText = kData.sound + vData.code;
+      
+      // Mainkan audio secara automatik bila kad diselak
+      playAudio();
+    }
+
+    // FUNGSI UTAMA SEBUTAN AUDIO (SPEECH SYNTHESIS)
+    function playAudio() {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel(); // Hentikan audio terdahulu jika ada
+
+        let utterance = new SpeechSynthesisUtterance(currentSpeechText);
+        utterance.lang = 'ms-MY'; // Bahasa Melayu
+        utterance.rate = 0.9;     // Kelajuan sebutan (sedikit perlahan untuk kejelasan murid)
+
+        window.speechSynthesis.speak(utterance);
+      }
+    }
+
+    function animateCard(cardId) {
+      const card = document.getElementById(cardId);
+      card.classList.remove('flip-animate');
+      void card.offsetWidth;
+      card.classList.add('flip-animate');
+    }
+
+    function nextKonsonan() {
+      kIndex = (kIndex + 1) % jawiList.length;
+      animateCard('konsonanCard');
+      updateDisplay();
+    }
+
+    function nextVokal() {
+      vIndex = (vIndex + 1) % vokalList.length;
+      animateCard('vokalCard');
+      updateDisplay();
+    }
+
+    // Inisialisasi paparan pertama tanpa audio automatik pada mula buka
+    window.onload = () => {
+      const kData = jawiList[kIndex];
+      const vData = vokalList[vIndex];
+      document.getElementById('konsonanJawi').innerText = kData.jawi;
+      document.getElementById('konsonanRumi').innerText = kData.rumi;
+      document.getElementById('vokalJawi').innerText = vData.jawi;
+      document.getElementById('vokalRumi').innerText = vData.rumi;
+      document.getElementById('resultJawi').innerText = kData.jawi + vData.jawi;
+      document.getElementById('resultRumi').innerText = kData.sound + vData.code.toUpperCase();
+      currentSpeechText = kData.sound + vData.code;
+    };
+  </script>
+</body>
+</html>
